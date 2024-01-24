@@ -1,0 +1,18 @@
+div id="login_stuff"
+    form id="login_form" action="user/login" method="post"
+        input type="text" name="username" placeholder="Enter username"
+        input type="text" name="password" placeholder="Enter password"   
+        input type="submit" value="Login"
+
+    button id="show_create_account_button" Create Account Instead
+
+div id="create_account_stuff"
+    form id="create_account_form" action="user/create" method="post"
+        input type="text" name="username" placeholder="Enter username"
+        input type="text" name="password" placeholder="Enter password"  
+        input type="text" name="password_confirm" placeholder="Enter password again"  
+        input type="submit" value="Create Account"
+
+    button id="show_login_button" Login Instead
+
+script src="/js/login.js"
