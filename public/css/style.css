@@ -9,6 +9,10 @@ form {
     display: none;
 } */
 
+#login_error {
+    color: red;
+}
+
 #create_account_stuff {
     display: none;
 }
