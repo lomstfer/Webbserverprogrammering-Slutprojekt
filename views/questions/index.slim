@@ -1,0 +1,9 @@
+== render(:slim, :"questions/new")
+
+div id="questions"
+    - questions.each do |question|
+        div class="question"
+            h2 class="question_title" = question["title"]
+            div class="question_owner" = question["owner"]
+            div class="question_time" = question["time_created"]
+            div class="question_points" = question["points"]

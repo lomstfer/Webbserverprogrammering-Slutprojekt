@@ -1,3 +1,7 @@
+* {
+    
+}
+
 form {
     display: flex;
     flex-direction: column;
@@ -9,10 +13,38 @@ form {
     display: none;
 } */
 
+body {
+    display: flex;
+    flex-direction: column;
+}
+
 #login_error {
     color: red;
 }
 
 #create_account_stuff {
     display: none;
+}
+
+#questions {
+    justify-self: center;
+    align-self: center;
+    min-width: 500px;
+}
+
+.question {
+    border-bottom: 1px solid black;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.question_points {
+    font-size: 50px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    /* justify-self: center; */
 }
