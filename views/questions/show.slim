@@ -1,0 +1,9 @@
+h2 = question["title"]
+div = question["points"]
+div = question["time_created"]
+
+== render(:slim, :"answers/new", locals:{question_id:question["id"]})
+
+h3 answers
+- answers.each do |answer|
+    == render(:slim, :"answers/show", locals:{answer_data:answer})
