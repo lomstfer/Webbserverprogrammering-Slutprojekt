@@ -1,9 +1,9 @@
 require "sinatra"
 require "sqlite3"
 require "bcrypt"
-require_relative "code/user_routes.rb"
-require_relative "code/questions_routes.rb"
-require_relative "code/answers_routes.rb"
+require_relative "code/user_posts.rb"
+require_relative "code/questions_posts.rb"
+require_relative "code/answers_posts.rb"
 
 enable(:sessions)
 
