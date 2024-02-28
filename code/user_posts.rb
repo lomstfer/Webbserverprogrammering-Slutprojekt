@@ -1,7 +1,7 @@
 require_relative "all_of.rb"
 
 def login(username)
-    id = getDataBase().execute("SELECT id FROM user WHERE username = (?)", username).first["id"]
+    id = get_data_base().execute("SELECT id FROM user WHERE username = (?)", username).first["id"]
     session[:id] = id
     redirect("/questions")
 end
@@ -14,7 +14,17 @@ post("/user/login") do
     username = params[:username]
     password = params[:password]
 
-    db = getDataBase()
+    if (username.length > $USERNAME_MAX_LENGTH)
+        session[:login_error] = "wrong username"
+        redirect("/")
+    end
+
+    if (password.length > $PASSWORD_MAX_LENGTH)
+        session[:login_error] = "wrong password"
+        redirect("/")
+    end
+
+    db = get_data_base()
     users = db.execute("SELECT * FROM user WHERE username = (?)", username)
     if (users.length > 0)
         user = users.first
@@ -32,23 +42,43 @@ post("/user/login") do
     redirect("/")
 end
 
-post("/user/create") do    
-    if (params[:password] != params[:password_confirm])
-        p "passwords do not match"
-        session[:login_error] = "passwords do not match"
-        redirect("/")
+post("/user/create") do
+    errors = []
+
+    if (params[:password].length > $PASSWORD_MAX_LENGTH)
+        errors.push("password too long")
     end
 
+    if (params[:password] != params[:password_confirm])
+        errors.push("passwords do not match")
+    end
+    
     username = params[:username]
+    if (get_data_base().execute("SELECT * FROM user WHERE username = (?)", username).length > 0)
+        errors.push("username taken")
+    end
+    
+    if (username.length > $USERNAME_MAX_LENGTH)
+        errors.push("username too long")
+    end
 
-    if (getDataBase().execute("SELECT * FROM user WHERE username = (?)", username).length > 0)
-        p "username taken"
-        session[:login_error] = "username taken"
+    if (params[:password].length < $PASSWORD_MIN_LENGTH)
+        errors.push("password too short")
+    end
+
+    if (errors.length > 0)
+        session[:login_error] = ""
+        errors.each_with_index do |e, i|
+            session[:login_error] += e
+            if (errors.length - 1 - i > 0)
+                session[:login_error] += ", "
+            end
+        end
         redirect("/")
     end
 
     pwd_digest = BCrypt::Password.create(params[:password])
-    getDataBase().execute("INSERT INTO user (username, pwd_digest) VALUES (?, ?)", username, pwd_digest)
+    get_data_base().execute("INSERT INTO user (username, pwd_digest) VALUES (?, ?)", username, pwd_digest)
 
     login(username)
 end

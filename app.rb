@@ -1,13 +1,14 @@
 require "sinatra"
 require "sqlite3"
 require "bcrypt"
+require_relative "code/constants.rb"
 require_relative "code/user_posts.rb"
 require_relative "code/questions_posts.rb"
 require_relative "code/answers_posts.rb"
 
 enable(:sessions)
 
-def getDataBase()
+def get_data_base()
     db = SQLite3::Database.new("db/db.db")
     db.results_as_hash = true
     return db
@@ -31,7 +32,7 @@ get("/") do
 end
 
 get("/questions") do
-    db = getDataBase()
+    db = get_data_base()
     questions = db.execute("SELECT * FROM question")
     questions.each do |q|
         q["owner"] = db.execute("SELECT username FROM user WHERE id = (?)", q["user_id"]).first["username"]
@@ -41,9 +42,11 @@ end
 
 get("/questions/:id") do
     id = params[:id]
-    db = getDataBase()
+    db = get_data_base()
     question = db.execute("SELECT * FROM question WHERE id = (?)", id).first
-    
+    owner = db.execute("SELECT username FROM user WHERE id = (?)", question["user_id"]).first["username"]
+    question["owner"] = owner
+
     answers = db.execute("SELECT * FROM answer WHERE question_id = (?)", id)
     answers.each do |a|
         a["owner"] = db.execute("SELECT username FROM user WHERE id = (?)", a["user_id"]).first["username"]

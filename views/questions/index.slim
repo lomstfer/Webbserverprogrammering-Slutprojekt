@@ -5,7 +5,7 @@ div id="questions"
         div class="question"
             a href="/questions/#{question['id']}" 
                 h2 class="question_title" = question["title"]
-            div class="question_owner" = question["owner"]
+            div class="question_owner" = "Asked by: " + question["owner"]
             div class="question_time" = question["time_created"]
             div class="question_points" = question["points"]
             form id="question_upvote_form" action="/questions/#{question['id']}/upvote" method="post"
