@@ -4,8 +4,15 @@ post("/questions") do
     user_id = session[:id]
     title = params[:title]
     time = Time.now.iso8601
+
+    db = get_data_base()
+    db.execute("INSERT INTO question (user_id, title, time_created) VALUES (?, ?, ?)", user_id, title, time)
     
-    get_data_base().execute("INSERT INTO question (user_id, title, time_created) VALUES (?, ?, ?)", user_id, title, time)
+    question_id = db.last_insert_row_id()
+    params["tags"].each do |tag_id|
+        db.execute("INSERT INTO question_tag_relation (question_id, tag_id) VALUES (?, ?)", question_id, tag_id)
+    end
+
     redirect("/questions")
 end
 
@@ -24,6 +31,11 @@ post("/questions/:id/downvote") do
         update_user_question_vote_value(session[:id], id, -1)
         update_question_points(id, -1)
     end
+    redirect("/questions")
+end
+
+post("/questions/:id/delete") do
+    p session[:is_admin]
     redirect("/questions")
 end
 

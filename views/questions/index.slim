@@ -1,10 +1,13 @@
-== render(:slim, :"questions/new")
+a href="/questions/new" ask question 
 
 div id="questions"
     - questions.each do |question|
         div class="question"
             a href="/questions/#{question['id']}" 
                 h2 class="question_title" = question["title"]
+            div class="question_tags"
+                - question["tags"].each do |t|
+                    div class="question_tag" #{t}
             div class="question_owner" = "Asked by: " + question["owner"]
             div class="question_time" = question["time_created"]
             div class="question_points" = question["points"]
@@ -12,3 +15,5 @@ div id="questions"
                 input type="submit" value="+"
             form id="question_downvote_form" action="/questions/#{question['id']}/downvote" method="post"
                 input type="submit" value="-"
+        form id="admin_question_delete" action="/questions/#{question['id']}/delete" method="post"
+                input type="submit" value="REMOVE"

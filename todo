@@ -1,3 +1,5 @@
+* admin, user, guest
+    admin kan ta bort frågor och svar och ta. kan CRUD tags
+    guest kan bara kolla på allt
+* sort
 * cooldown
-* admin
-* 

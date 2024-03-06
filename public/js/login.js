@@ -1,6 +1,3 @@
-// const req = new XMLHttpRequest()
-// req.open("POST", "/testinge")
-// req.send()
 var createAccountStuff = document.getElementById("create_account_stuff");
 var loginStuff = document.getElementById("login_stuff");
 var showCreateAccountButton = document.getElementById("show_create_account_button");

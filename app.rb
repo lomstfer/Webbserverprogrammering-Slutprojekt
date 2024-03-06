@@ -24,7 +24,11 @@ before() do
                request.path_info != "/")
             redirect("/")
         end
+        return
     end
+
+    admin = get_data_base().execute("SELECT is_admin FROM user WHERE id = (?)", session[:id]).first["is_admin"]
+    session[:is_admin] = admin == 1
 end
 
 get("/") do
@@ -36,8 +40,26 @@ get("/questions") do
     questions = db.execute("SELECT * FROM question")
     questions.each do |q|
         q["owner"] = db.execute("SELECT username FROM user WHERE id = (?)", q["user_id"]).first["username"]
+        
+        tags_on_question = db.execute("
+            SELECT name
+            FROM tag
+            INNER JOIN question_tag_relation ON question_tag_relation.tag_id = tag.id
+            WHERE question_id = (?)",
+            q["id"])
+        q["tags"] = []
+        tags_on_question.each do |t|
+            q["tags"].push(t["name"])
+        end
     end
-    slim(:"questions/index", locals:{questions:questions})
+
+    slim(:"questions/index", locals:{questions:questions, is_admin:session[:is_admin]})
+end
+
+get("/questions/new") do
+    db = get_data_base()
+    tags = db.execute("SELECT * FROM tag")
+    slim(:"questions/new", locals:{tags:tags})
 end
 
 get("/questions/:id") do
@@ -46,6 +68,17 @@ get("/questions/:id") do
     question = db.execute("SELECT * FROM question WHERE id = (?)", id).first
     owner = db.execute("SELECT username FROM user WHERE id = (?)", question["user_id"]).first["username"]
     question["owner"] = owner
+    
+    tags_on_question = db.execute("
+        SELECT name
+        FROM tag
+        INNER JOIN question_tag_relation ON question_tag_relation.tag_id = tag.id
+        WHERE question_id = (?)",
+        question["id"])
+    question["tags"] = []
+    tags_on_question.each do |t|
+        question["tags"].push(t["name"])
+    end
 
     answers = db.execute("SELECT * FROM answer WHERE question_id = (?)", id)
     answers.each do |a|
