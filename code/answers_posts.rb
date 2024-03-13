@@ -29,6 +29,19 @@ post("/answers/:id/downvote") do
     redirect(url)
 end
 
+post("/answers/:id/delete") do
+    if (!session[:is_admin])
+        redirect("/questions")
+    end
+
+    id = params[:id]
+    question_url = get_questionurl_from_answer(id)
+    
+    get_data_base().execute("DELETE FROM answer WHERE id = (?)", id)
+
+    redirect(question_url)
+end
+
 def update_answer_points(id, points_to_add)
     prev_points = get_data_base().execute("SELECT points FROM answer WHERE id = (?)", id).first["points"]
     new_points = (prev_points.to_i + points_to_add).to_s

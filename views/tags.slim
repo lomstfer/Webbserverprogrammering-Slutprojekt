@@ -1,0 +1,9 @@
+h2 tags 
+ul 
+    - tags.each do |t|
+        li #{t}
+
+h2 add tag 
+form action="/admin/tags" method="post"
+    input type="text" name="name" placeholder="Enter name of new tag"
+    input type="submit" value="ADD"

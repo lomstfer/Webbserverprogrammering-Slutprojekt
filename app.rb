@@ -5,8 +5,11 @@ require_relative "code/constants.rb"
 require_relative "code/user_posts.rb"
 require_relative "code/questions_posts.rb"
 require_relative "code/answers_posts.rb"
+require_relative "code/admin_posts.rb"
+require_relative "code/misc_posts.rb"
 
 enable(:sessions)
+set(:session_secret, 'fa5BBHS41ZAdUTQ4R4zk48fZxxz66XkfxutJ4hA3Irn3QiBURqsdJ0110hIIQ5Gt')
 
 def get_data_base()
     db = SQLite3::Database.new("db/db.db")
@@ -31,8 +34,16 @@ before() do
     session[:is_admin] = admin == 1
 end
 
+before("/admin/*") do
+    if (!session[:is_admin])
+        redirect("/")
+    end
+end
+
 get("/") do
-    slim(:login, locals:{login_error: session[:login_error]})
+    session[:is_admin] = false
+    session[:is_guest] = false
+    slim(:login, locals:{login_error: session[:login_error], is_admin:session[:is_admin]})
 end
 
 get("/questions") do
@@ -87,6 +98,12 @@ get("/questions/:id") do
 
     slim(:"questions/show", locals:{
         question:question,
-        answers:answers
+        answers:answers,
+        is_admin:session[:is_admin]
     })
+end
+
+get("/admin/tags") do
+    tags = get_data_base().execute("SELECT * from tag")
+    slim(:tags, locals:{tags:tags})
 end

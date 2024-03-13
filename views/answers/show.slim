@@ -7,3 +7,6 @@ div class="answer"
         input type="submit" value="+"
     form id="answer_downvote_form" action="/answers/#{answer_data['id']}/downvote" method="post"
         input type="submit" value="-"
+    - if is_admin
+        form id="admin_question_delete" action="/answers/#{answer_data['id']}/delete" method="post"
+            input type="submit" value="REMOVE"

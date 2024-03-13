@@ -1,3 +1,6 @@
+nav 
+    a href="/questions" Questions
+
 h2 = question["title"]
 div class="question_tags"
     - question["tags"].each do |t|
@@ -10,4 +13,4 @@ div = question["time_created"]
 
 h3 answers
 - answers.each do |answer|
-    == render(:slim, :"answers/show", locals:{answer_data:answer})
+    == render(:slim, :"answers/show", locals:{answer_data:answer, is_admin:is_admin})

@@ -1,3 +1,8 @@
+- if is_admin
+    div id="admin-dashboard"
+        h2 admin dashboard
+        a href="/admin/tags" crud tags
+
 a href="/questions/new" ask question 
 
 div id="questions"
@@ -15,5 +20,6 @@ div id="questions"
                 input type="submit" value="+"
             form id="question_downvote_form" action="/questions/#{question['id']}/downvote" method="post"
                 input type="submit" value="-"
-        form id="admin_question_delete" action="/questions/#{question['id']}/delete" method="post"
+        - if is_admin
+            form id="admin_question_delete" action="/questions/#{question['id']}/delete" method="post"
                 input type="submit" value="REMOVE"

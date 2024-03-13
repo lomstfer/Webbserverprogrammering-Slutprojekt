@@ -35,7 +35,13 @@ post("/questions/:id/downvote") do
 end
 
 post("/questions/:id/delete") do
-    p session[:is_admin]
+    if (!session[:is_admin])
+        redirect("/questions")
+    end
+    
+    id = params[:id]
+    get_data_base().execute("DELETE FROM question WHERE id = (?)", id)
+
     redirect("/questions")
 end
 
