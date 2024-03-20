@@ -3,10 +3,11 @@ div class="answer"
     div = answer_data["points"]
     div = answer_data["time_created"]
     div = answer_data["owner"]
-    form id="answer_upvote_form" action="/answers/#{answer_data['id']}/upvote" method="post"
-        input type="submit" value="+"
-    form id="answer_downvote_form" action="/answers/#{answer_data['id']}/downvote" method="post"
-        input type="submit" value="-"
+    - if !is_guest
+        form id="answer_upvote_form" action="/answers/#{answer_data['id']}/upvote" method="post"
+            input type="submit" value="+"
+        form id="answer_downvote_form" action="/answers/#{answer_data['id']}/downvote" method="post"
+            input type="submit" value="-"
     - if is_admin
         form id="admin_question_delete" action="/answers/#{answer_data['id']}/delete" method="post"
             input type="submit" value="REMOVE"

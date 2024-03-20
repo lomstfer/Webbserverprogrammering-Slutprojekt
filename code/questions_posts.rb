@@ -70,3 +70,13 @@ def update_user_question_vote_value(user_id, question_id, vote_value_to_add)
     new_vote_value = (prev_vote_value.to_i + vote_value_to_add).to_s
     get_data_base().execute("UPDATE user_question_vote SET vote_value = (?) WHERE user_id = (?) AND question_id = (?)", new_vote_value, user_id, question_id)
 end
+
+post("/questions/sort/points") do
+    s = session[:question_sort_by]
+    if s == "points_descending"
+        session[:question_sort_by] = "points_ascending"
+    else
+        session[:question_sort_by] = "points_descending"
+    end
+    redirect("/questions")
+end

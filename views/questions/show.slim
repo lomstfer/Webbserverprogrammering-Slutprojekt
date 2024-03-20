@@ -9,8 +9,9 @@ div = "Asked by: " + question["owner"]
 div = question["points"]
 div = question["time_created"]
 
-== render(:slim, :"answers/new", locals:{question_id:question["id"]})
+- if !is_guest
+    == render(:slim, :"answers/new", locals:{question_id:question["id"]})
 
 h3 answers
 - answers.each do |answer|
-    == render(:slim, :"answers/show", locals:{answer_data:answer, is_admin:is_admin})
+    == render(:slim, :"answers/show", locals:{answer_data:answer, is_admin:is_admin, is_guest:is_guest})

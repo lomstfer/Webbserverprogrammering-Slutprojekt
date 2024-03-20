@@ -3,7 +3,17 @@
         h2 admin dashboard
         a href="/admin/tags" crud tags
 
-a href="/questions/new" ask question 
+- if !is_guest
+    a href="/questions/new" ask question 
+
+h2 sort by:
+form action="/questions/sort/points" method="post"
+    - if question_sort_by == "points_descending"
+        input type="submit" value="points_ascending"
+    - else 
+        input type="submit" value="points_descending"
+form action="/questions/sort/time" method="post"  
+    input type="submit" value="time"
 
 div id="questions"
     - questions.each do |question|
@@ -16,10 +26,11 @@ div id="questions"
             div class="question_owner" = "Asked by: " + question["owner"]
             div class="question_time" = question["time_created"]
             div class="question_points" = question["points"]
-            form id="question_upvote_form" action="/questions/#{question['id']}/upvote" method="post"
-                input type="submit" value="+"
-            form id="question_downvote_form" action="/questions/#{question['id']}/downvote" method="post"
-                input type="submit" value="-"
+            - if !is_guest
+                form id="question_upvote_form" action="/questions/#{question['id']}/upvote" method="post"
+                    input type="submit" value="+"
+                form id="question_downvote_form" action="/questions/#{question['id']}/downvote" method="post"
+                    input type="submit" value="-"
         - if is_admin
             form id="admin_question_delete" action="/questions/#{question['id']}/delete" method="post"
                 input type="submit" value="REMOVE"

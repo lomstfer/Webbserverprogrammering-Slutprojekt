@@ -9,7 +9,6 @@ require_relative "code/admin_posts.rb"
 require_relative "code/misc_posts.rb"
 
 enable(:sessions)
-set(:session_secret, 'fa5BBHS41ZAdUTQ4R4zk48fZxxz66XkfxutJ4hA3Irn3QiBURqsdJ0110hIIQ5Gt')
 
 def get_data_base()
     db = SQLite3::Database.new("db/db.db")
@@ -18,6 +17,11 @@ def get_data_base()
 end
 
 before() do
+    except_routes = ["/login_as_guest"]
+    if except_routes.include?(request.path_info) || session[:is_guest]
+        return
+    end
+
     if (session[:id] == nil)
         if (request.request_method == "POST" &&
             request.path_info != "/user/login" &&
@@ -41,9 +45,11 @@ before("/admin/*") do
 end
 
 get("/") do
-    session[:is_admin] = false
-    session[:is_guest] = false
-    slim(:login, locals:{login_error: session[:login_error], is_admin:session[:is_admin]})
+    login_error = session[:login_error]
+    login_timestamp = session[:login_create_timestamp]
+    session.clear()
+    session[:login_create_timestamp] = login_timestamp
+    slim(:login, locals:{login_error: login_error})
 end
 
 get("/questions") do
@@ -64,7 +70,23 @@ get("/questions") do
         end
     end
 
-    slim(:"questions/index", locals:{questions:questions, is_admin:session[:is_admin]})
+    if session[:question_sort_by] == nil
+        session[:question_sort_by] = "points_descending"
+    end
+    if session[:question_sort_by] != nil
+        if session[:question_sort_by] == "points_descending"
+            questions.sort_by!{|q| -q["points"]}
+        elsif session[:question_sort_by] == "points_ascending"
+            questions.sort_by!{|q| q["points"]}
+        end
+    end
+
+    slim(:"questions/index", locals:{
+        questions:questions, 
+        is_admin:session[:is_admin], 
+        is_guest:session[:is_guest],
+        question_sort_by:session[:question_sort_by]
+    })
 end
 
 get("/questions/new") do
@@ -99,7 +121,8 @@ get("/questions/:id") do
     slim(:"questions/show", locals:{
         question:question,
         answers:answers,
-        is_admin:session[:is_admin]
+        is_admin:session[:is_admin],
+        is_guest:session[:is_guest]
     })
 end
 
