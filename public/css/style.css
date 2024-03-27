@@ -45,6 +45,7 @@ body {
     justify-self: center;
     align-self: center;
     min-width: 500px;
+    overflow: hidden;
 }
 
 .question {
@@ -53,6 +54,7 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
+    max-width: 50vw;
 }
 
 .question_points {
@@ -62,6 +64,10 @@ body {
     top: 50%;
     transform: translateY(-50%);
     /* justify-self: center; */
+}
+
+#question_title {
+    overflow-wrap: break-word;
 }
 
 .answer {

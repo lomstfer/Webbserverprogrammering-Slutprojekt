@@ -2,8 +2,11 @@ require "sinatra"
 require "sqlite3"
 require "bcrypt"
 require_relative "code/constants.rb"
+require_relative "code/user_model.rb"
 require_relative "code/user_posts.rb"
+require_relative "code/questions_model.rb"
 require_relative "code/questions_posts.rb"
+require_relative "code/answers_model.rb"
 require_relative "code/answers_posts.rb"
 require_relative "code/admin_posts.rb"
 require_relative "code/misc_posts.rb"
@@ -53,33 +56,14 @@ get("/") do
 end
 
 get("/questions") do
-    db = get_data_base()
-    questions = db.execute("SELECT * FROM question")
-    questions.each do |q|
-        q["owner"] = db.execute("SELECT username FROM user WHERE id = (?)", q["user_id"]).first["username"]
-        
-        tags_on_question = db.execute("
-            SELECT name
-            FROM tag
-            INNER JOIN question_tag_relation ON question_tag_relation.tag_id = tag.id
-            WHERE question_id = (?)",
-            q["id"])
-        q["tags"] = []
-        tags_on_question.each do |t|
-            q["tags"].push(t["name"])
-        end
-    end
+    questions = get_questions()
+
+    set_owner_and_tags_on_questions(questions)
 
     if session[:question_sort_by] == nil
         session[:question_sort_by] = "points_descending"
     end
-    if session[:question_sort_by] != nil
-        if session[:question_sort_by] == "points_descending"
-            questions.sort_by!{|q| -q["points"]}
-        elsif session[:question_sort_by] == "points_ascending"
-            questions.sort_by!{|q| q["points"]}
-        end
-    end
+    sort_questions(session[:question_sort_by], questions)
 
     slim(:"questions/index", locals:{
         questions:questions, 
@@ -98,25 +82,13 @@ end
 get("/questions/:id") do
     id = params[:id]
     db = get_data_base()
-    question = db.execute("SELECT * FROM question WHERE id = (?)", id).first
-    owner = db.execute("SELECT username FROM user WHERE id = (?)", question["user_id"]).first["username"]
-    question["owner"] = owner
+    question = get_question(id)
+    question["owner"] = get_username_from_user_id(question["user_id"])
     
-    tags_on_question = db.execute("
-        SELECT name
-        FROM tag
-        INNER JOIN question_tag_relation ON question_tag_relation.tag_id = tag.id
-        WHERE question_id = (?)",
-        question["id"])
-    question["tags"] = []
-    tags_on_question.each do |t|
-        question["tags"].push(t["name"])
-    end
+    set_tags_on_question(question)
 
-    answers = db.execute("SELECT * FROM answer WHERE question_id = (?)", id)
-    answers.each do |a|
-        a["owner"] = db.execute("SELECT username FROM user WHERE id = (?)", a["user_id"]).first["username"]
-    end
+    answers = get_answers(id)
+    set_owner_on_answers(answers, id)
 
     slim(:"questions/show", locals:{
         question:question,

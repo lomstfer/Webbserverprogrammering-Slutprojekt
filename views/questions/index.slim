@@ -9,11 +9,14 @@
 h2 sort by:
 form action="/questions/sort/points" method="post"
     - if question_sort_by == "points_descending"
-        input type="submit" value="points_ascending"
+        input type="submit" value="points ascending"
     - else 
-        input type="submit" value="points_descending"
-form action="/questions/sort/time" method="post"  
-    input type="submit" value="time"
+        input type="submit" value="points descending"
+form action="/questions/sort/time" method="post"
+    - if question_sort_by == "time_descending"
+        input type="submit" value="time old first"
+    - else 
+        input type="submit" value="time new first"
 
 div id="questions"
     - questions.each do |question|

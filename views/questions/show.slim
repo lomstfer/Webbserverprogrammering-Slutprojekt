@@ -1,7 +1,7 @@
 nav 
     a href="/questions" Questions
 
-h2 = question["title"]
+h2 id="question_title" = question["title"]
 div class="question_tags"
     - question["tags"].each do |t|
         div class="question_tag" #{t}
