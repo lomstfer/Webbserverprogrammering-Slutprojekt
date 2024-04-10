@@ -13,12 +13,18 @@ require_relative "code/misc_posts.rb"
 
 enable(:sessions)
 
+include Model
+
+# Reads the database file and returns it
+#
 def get_data_base()
     db = SQLite3::Database.new("db/db.db")
     db.results_as_hash = true
     return db
 end
 
+# Checks that user is logged in before both gets and posts. Sets is_admin in session
+#
 before() do
     except_routes = ["/login_as_guest"]
     if except_routes.include?(request.path_info) || session[:is_guest]
@@ -41,12 +47,16 @@ before() do
     session[:is_admin] = admin == 1
 end
 
+# Protects all admin pages
+#
 before("/admin/*") do
     if (!session[:is_admin])
         redirect("/")
     end
 end
 
+# Displays a page with login and create account forms
+#
 get("/") do
     login_error = session[:login_error]
     login_timestamp = session[:login_create_timestamp]
@@ -55,6 +65,11 @@ get("/") do
     slim(:login, locals:{login_error: login_error})
 end
 
+# Displays a page with all questions
+#
+# @see Model#get_questions
+# @see Model#set_owner_and_tags_on_questions
+# @see Model#sort_questions
 get("/questions") do
     questions = get_questions()
 
@@ -73,12 +88,22 @@ get("/questions") do
     })
 end
 
+# Displays a page with a form to post a new question
+#
 get("/questions/new") do
     db = get_data_base()
     tags = db.execute("SELECT * FROM tag")
     slim(:"questions/new", locals:{tags:tags})
 end
 
+# Displays a page for an individual question and its answers
+#
+# @param [Integer] id the id of the question
+#
+# @see Model#get_question
+# @see Model#get_username_from_user_id
+# @see Model#get_answers
+# @see Model#set_owner_on_answers
 get("/questions/:id") do
     id = params[:id]
     db = get_data_base()
@@ -88,7 +113,7 @@ get("/questions/:id") do
     set_tags_on_question(question)
 
     answers = get_answers(id)
-    set_owner_on_answers(answers, id)
+    set_owner_on_answers(answers)
 
     slim(:"questions/show", locals:{
         question:question,
@@ -98,6 +123,8 @@ get("/questions/:id") do
     })
 end
 
+# Displays an admin page where you can add tags
+#
 get("/admin/tags") do
     tags = get_data_base().execute("SELECT * from tag")
     slim(:tags, locals:{tags:tags})
