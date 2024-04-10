@@ -62,7 +62,7 @@ post("/questions/:id/delete") do
         redirect("/questions")
     end
 
-    remove_question(params[:id])
+    remove_question_and_related(params[:id])
     
     redirect("/questions")
 end

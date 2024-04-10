@@ -14,7 +14,9 @@ module Model
     #
     # @param [Integer] id, the id of the answer
     def remove_answer(id)
-        get_data_base().execute("DELETE FROM answer WHERE id = (?)", id)
+        db = get_data_base()
+        db.execute("DELETE FROM answer WHERE id = (?)", id)
+        db.execute("DELETE FROM user_answer_vote WHERE answer_id = (?)", id)
     end
 
     # Adds/removes points from an answer

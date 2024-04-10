@@ -22,8 +22,17 @@ module Model
     #
     # @param [Integer] id, the id of the question
     #
-    def remove_question(id)
-        get_data_base().execute("DELETE FROM question WHERE id = (?)", id)
+    def remove_question_and_related(id)
+        db = get_data_base()
+
+        db.execute("DELETE FROM question WHERE id = (?)", id)
+        db.execute("DELETE FROM question_tag_relation WHERE question_id = (?)", id)
+        db.execute("DELETE FROM user_question_vote WHERE question_id = (?)", id)
+
+        answers = db.execute("SELECT id FROM answer WHERE question_id = (?)", id)
+        answers.each do |a|
+            remove_answer(a["id"])
+        end
     end
 
     # Sets the owner (username) and tags on the question hash
