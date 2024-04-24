@@ -101,6 +101,28 @@ module Model
         end
     end
 
+    # Sets a boolean on all the questions that shows if the user owns it
+    #
+    # @param [Integer] user_id, the user id
+    # @param [Array] questions, the question hashes
+    #
+    def set_is_owned_by_user_on_questions(user_id, questions)
+        db = get_data_base()
+        questions.each do |q|
+            q["is_owned_by_user"] = user_owns_question?(user_id, q["id"])
+        end
+    end
+
+    # Returns a boolean indicating wether the user owns the question
+    #
+    # @param [Integer] user_id, the user id
+    # @param [Integer] question_id, the question id
+    #
+    def user_owns_question?(user_id, question_id)
+        owned = get_data_base().execute("SELECT * from question WHERE id = ? AND user_id = ?", question_id, user_id)
+        return owned.length != 0
+    end
+
     # Gets all questions
     #
     # @return [Array] the questions

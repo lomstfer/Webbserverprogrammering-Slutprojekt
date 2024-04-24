@@ -62,12 +62,13 @@ end
 # @see Model#get_questionurl_from_answer
 # @see Model#remove_answer
 post("/answers/:id/delete") do
-    if (!session[:is_admin])
-        redirect("/questions")
-    end
-
     id = params[:id]
+
     question_url = get_questionurl_from_answer(id)
+
+    if (!session[:is_admin] && !user_owns_answer?(session[:id], id))
+        redirect(question_url)
+    end
     
     remove_answer(id)
 

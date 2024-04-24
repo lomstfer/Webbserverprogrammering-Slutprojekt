@@ -58,11 +58,13 @@ end
 #
 # @see Model#remove_question
 post("/questions/:id/delete") do
-    if (!session[:is_admin])
+    question_id = params[:id]
+
+    if (!session[:is_admin] && !user_owns_question?(session[:id], question_id))
         redirect("/questions")
     end
 
-    remove_question_and_related(params[:id])
+    remove_question_and_related(question_id)
     
     redirect("/questions")
 end

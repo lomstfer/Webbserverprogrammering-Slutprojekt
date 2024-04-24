@@ -79,6 +79,7 @@ get("/questions") do
         session[:question_sort_by] = "points_descending"
     end
     sort_questions(session[:question_sort_by], questions)
+    set_is_owned_by_user_on_questions(session[:id], questions)
 
     slim(:"questions/index", locals:{
         questions:questions, 
@@ -114,6 +115,7 @@ get("/questions/:id") do
 
     answers = get_answers(id)
     set_owner_on_answers(answers)
+    set_is_owned_by_user_on_answers(session[:id], answers)
 
     slim(:"questions/show", locals:{
         question:question,

@@ -30,6 +30,28 @@ module Model
         get_data_base().execute("UPDATE answer SET points = (?) WHERE id = (?)", new_points, id)
     end
 
+    # Sets a boolean on all the answers that shows if the user owns it
+    #
+    # @param [Integer] user_id, the user id
+    # @param [Array] answers, the answer hashes
+    #
+    def set_is_owned_by_user_on_answers(user_id, answers)
+        db = get_data_base()
+        answers.each do |a|
+            a["is_owned_by_user"] = user_owns_answer?(user_id, a["id"])
+        end
+    end
+
+    # Returns a boolean indicating wether the user owns the answer
+    #
+    # @param [Integer] user_id, the user id
+    # @param [Integer] answer_id, the answer id
+    #
+    def user_owns_answer?(user_id, answer_id)
+        owned = get_data_base().execute("SELECT * from answer WHERE id = ? AND user_id = ?", answer_id, user_id)
+        return owned.length != 0
+    end
+
     # Gets the URL to the question that the answer belongs to
     #
     # @param [Integer] answer_id, the id of the answer

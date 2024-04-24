@@ -34,6 +34,6 @@ div id="questions"
                     input type="submit" value="+"
                 form id="question_downvote_form" action="/questions/#{question['id']}/downvote" method="post"
                     input type="submit" value="-"
-        - if is_admin
+        - if is_admin || question["is_owned_by_user"]
             form id="admin_question_delete" action="/questions/#{question['id']}/delete" method="post"
                 input type="submit" value="REMOVE"
